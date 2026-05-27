@@ -31,3 +31,20 @@
   flex-direction: column;
   gap: 25px;
 }
+
+.collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+
+  transition: grid-template-rows 0.3s ease;
+
+  &--show {
+    grid-template-rows: 1fr;
+  }
+}
+
+.collapse__inner {
+  min-height: 0;
+
+  overflow: hidden;
+}

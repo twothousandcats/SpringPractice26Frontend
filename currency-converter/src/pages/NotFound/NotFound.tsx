@@ -1,7 +1,11 @@
-import './NotFound.module.scss';
+import styles from './NotFound.module.scss';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle.ts';
 
 export const NotFound = () => {
-    return (
-        <div></div>
-    );
-}
+  useDocumentTitle('Not Found');
+  return (
+    <div className={styles['not-found']}>
+      NotFound
+    </div>
+  );
+};

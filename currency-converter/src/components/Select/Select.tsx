@@ -3,7 +3,7 @@ import {SelectList} from "../SelectList/SelectList.tsx";
 import type {Currencies} from "../../models/types.ts";
 import {formatNumber} from "../../utils/functions.ts";
 import {TriangleDownIcon} from "../Icons/TriangleDownIcon.tsx";
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 
 type SelectProps = {
     currencies: Currencies;
@@ -28,10 +28,37 @@ export const Select = (
         readOnly = false,
     }: SelectProps) => {
     const [isOpen, setIsOpen] = useState(false);
-    console.log(isOpen);
+    const containerRef = useRef<HTMLDivElement>(null);
 
+    useEffect(() => {
+        if (!isOpen) {
+            return;
+        }
+
+        const handleOutsideClick = (event: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        }
+
+        const handleEsc = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
+                setIsOpen(false);
+            }
+        }
+
+        document.addEventListener('keydown', handleEsc);
+        document.addEventListener('click', handleOutsideClick);
+
+        return () => {
+            document.removeEventListener('keydown', handleEsc);
+            document.removeEventListener('click', handleOutsideClick);
+        };
+
+    }, [isOpen]);
     return (
         <div className={styles.select}
+             ref={containerRef}
              data-testid={containerTestId}>
             <input
                 type="number"

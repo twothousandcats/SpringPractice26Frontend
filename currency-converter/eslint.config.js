@@ -1,5 +1,6 @@
 import js from '@eslint/js';
 import eslintConfigPrettier from 'eslint-config-prettier/flat';
+import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import {defineConfig, globalIgnores} from 'eslint/config';
@@ -16,6 +17,12 @@ export default defineConfig([
             reactHooks.configs.flat.recommended,
             reactRefresh.configs.vite
         ],
+        plugins: {
+            react
+        },
+        settings: {
+            react: {version: 'detect'}
+        },
         linterOptions: {
             reportUnusedDisableDirectives: 'warn'
         },
@@ -29,6 +36,15 @@ export default defineConfig([
             'no-debugger': 'error',
             'no-alert': 'warn',
             'no-unused-vars': 'off',
+            '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+            'react/function-component-definition': [
+                2,
+                {namedComponents: 'arrow-function'}
+            ],
+            'no-restricted-exports': [
+                'error',
+                {restrictDefaultExports: {direct: true}}
+            ],
             '@typescript-eslint/no-magic-numbers': [
                 'warn',
                 {
