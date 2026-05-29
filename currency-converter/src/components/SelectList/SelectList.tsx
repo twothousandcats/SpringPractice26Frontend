@@ -19,7 +19,7 @@ export const SelectList = (
     }: SelectListProps) => {
     const classNames = concatClassNames([
         styles.list,
-        isOpen && styles["list--show"]
+        isOpen && styles.listShow
     ]);
 
     return (

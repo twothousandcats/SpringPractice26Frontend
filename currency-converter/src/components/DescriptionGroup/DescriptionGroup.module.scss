@@ -1,28 +1,30 @@
 @use '../../utils/styles/base' as *;
 
 .descriptionGroup {
-  width: 100%;
   display: flex;
   flex-direction: column;
+  inline-size: 100%;
 }
 
 .btnContainer {
   position: relative;
 
-  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
 
-  &:after {
+  inline-size: 100%;
+
+  &::after {
     content: '';
+
     position: absolute;
     z-index: 1;
 
-    width: 100%;
-    height: 1px;
+    inline-size: 100%;
+    block-size: 1px;
 
-    background-color: $borderColor;
+    background-color: $border-color;
   }
 }
 
@@ -35,16 +37,14 @@
 .collapse {
   display: grid;
   grid-template-rows: 0fr;
-
   transition: grid-template-rows 0.3s ease;
 
-  &--show {
+  &Show {
     grid-template-rows: 1fr;
   }
 }
 
-.collapse__inner {
-  min-height: 0;
-
+.collapseInner {
+  min-block-size: 0;
   overflow: hidden;
 }

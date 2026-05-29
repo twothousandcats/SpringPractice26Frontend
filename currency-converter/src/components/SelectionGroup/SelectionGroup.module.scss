@@ -1,8 +1,9 @@
 .selectionGroup {
-  max-width: 600px;
-  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 22px;
+  align-items: center;
+
+  inline-size: 100%;
+  max-inline-size: 600px;
 }

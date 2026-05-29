@@ -3,24 +3,19 @@
 .icon {
   display: flex;
 
-  &--triangle {
-    position: absolute;
-    right: 30px;
-
-    margin-left: auto;
-
+  &Triangle {
     path {
-      fill: $borderColor;
-      stroke: $borderColor;
+      fill: $border-color;
+      stroke: $border-color;
     }
   }
 
-  &--arrow {
-    margin-left: auto;
+  &Arrow {
+    margin-inline-start: auto;
 
     path {
-      fill: $accentBorderColor;
-      stroke: $accentBorderColor;
+      fill: $accent-border-color;
+      stroke: $accent-border-color;
     }
   }
 }

@@ -1,18 +1,19 @@
 @use '../../utils/styles/base' as *;
 
 .btn {
-  width: 100%;
+  inline-size: 100%;
   padding: 10px;
 
+  background-color: $border-color;
+  border: 1px solid $border-color;
+  border-radius: 23px;
+
+  color: $accent-text;
   font-size: 22px;
   line-height: 1;
-  color: $accentText;
-
-  border: 1px solid $borderColor;
-  border-radius: 23px;
-  background-color: $borderColor;
 
   transition: background-color 0.3s ease;
+
   cursor: pointer;
 
   &:hover {

@@ -4,14 +4,14 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
-  margin-top: 24px;
+  margin-block-start: 24px;
 }
 
 .descriptionLineHeading {
-  font-weight: 700;
+  color: $accent-text;
   font-size: 26px;
+  font-weight: 700;
   line-height: 1;
-  color: $accentText;
 }
 
 .descriptionLineText {

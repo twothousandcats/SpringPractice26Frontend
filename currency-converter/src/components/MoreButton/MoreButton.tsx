@@ -1,27 +1,26 @@
 import styles from './MoreButton.module.scss';
-import {ArrowUpIcon} from "../Icons/ArrowUpIcon.tsx";
-import {concatClassNames} from "../../utils/functions.ts";
+import { ArrowUpIcon } from '../Icons/ArrowUpIcon.tsx';
+import { IconContainer } from '../IconContainer/IconContainer.tsx';
 
 type MoreButtonProps = {
-    title: string;
-    isOpen: boolean;
-    onToggle: () => void;
+  title: string;
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
-export const MoreButton = ({title, isOpen, onToggle}: MoreButtonProps) => {
-    const classNames = concatClassNames([
-        styles["more-button"],
-        isOpen && styles["more-button--show"],
-    ]);
-    return (
-        <button
-            type="button"
-            className={classNames}
-            aria-expanded={isOpen}
-            onClick={onToggle}
-        >
-            {title}
-            <ArrowUpIcon/>
-        </button>
-    );
-}
+export const MoreButton = ({ title, isOpen, onToggle }: MoreButtonProps) => {
+  return (
+    <button
+      type="button"
+      className={styles.moreButton}
+      aria-expanded={isOpen}
+      onClick={onToggle}
+    >
+      {title}
+      <IconContainer
+        icon={<ArrowUpIcon />}
+        isActive={isOpen}
+      />
+    </button>
+  );
+};

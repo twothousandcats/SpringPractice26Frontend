@@ -14,7 +14,7 @@ export const DescriptionGroup = ({ from, to }: DescriptionGroupProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const collapseClasses = concatClassNames([
     styles.collapse,
-    isOpen && styles['collapse--show']
+    isOpen && styles.collapseShow
   ]);
 
   return (
@@ -29,7 +29,7 @@ export const DescriptionGroup = ({ from, to }: DescriptionGroupProps) => {
         />
       </div>
       <div className={collapseClasses}>
-        <div className={styles['collapse__inner']}>
+        <div className={styles.collapseInner}>
           <div className={styles.descriptionLinesSeparator}>
             <DescriptionLine currency={from} />
             <DescriptionLine currency={to} />
