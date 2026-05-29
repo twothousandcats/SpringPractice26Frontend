@@ -10,7 +10,6 @@ export const formatNumber = (value: number): string => {
     : value.toFixed(2);
 };
 
-// `Convert from ${fromCurrency.name} to ${toCurrency.name}`
 export const formatDateTime = (iso: string): string => {
   if (!iso) {
     return '';

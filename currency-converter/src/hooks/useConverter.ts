@@ -13,42 +13,42 @@ const firstDifferentCode = (code: string): string => {
 };
 
 export const useConverter = () => {
-  const [from, setFromCode] = useState<string>(currencies[0].code); // code
-  const [to, setToCode] = useState<string>(currencies[1].code); // code
+  const [fromCode, setFromCode] = useState<string>(currencies[0].code);
+  const [toCode, setToCode] = useState<string>(currencies[1].code);
   const [amount, setAmount] = useState<number>(1);
 
   const setFrom = (code: string): void => {
     setFromCode(code);
-    if (code === to) {
+    if (code === toCode) {
       setToCode(firstDifferentCode(code));
     }
   };
 
   const setTo = (code: string): void => {
     setToCode(code);
-    if (code === from) {
+    if (code === fromCode) {
       setFromCode(firstDifferentCode(code));
     }
   };
 
   const swap = (): void => {
-    setFromCode(to);
-    setToCode(from);
+    setFromCode(toCode);
+    setToCode(fromCode);
   };
 
-  const rate = priceChanges[from]?.[to]?.price ?? 0;
-  const result = amount * rate;
+  const rate = priceChanges[fromCode]?.[toCode]?.price ?? 0;
+  const conversionResult = amount * rate;
 
-  const fromCurrency = findByCode(from);
-  const toCurrency = findByCode(to);
-  const dateTime = priceChanges[from]?.[to]?.dateTime ?? '';
+  const fromCurrency = findByCode(fromCode);
+  const toCurrency = findByCode(toCode);
+  const dateTime = priceChanges[fromCode]?.[toCode]?.dateTime ?? '';
 
   return {
     currencies,
-    from,
-    to,
+    fromCode,
+    toCode,
     amount,
-    result,
+    conversionResult,
     rate,
     fromCurrency,
     toCurrency,

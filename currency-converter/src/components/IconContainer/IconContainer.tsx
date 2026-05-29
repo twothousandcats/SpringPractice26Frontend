@@ -12,7 +12,7 @@ export const IconContainer = (
   {
     icon,
     isActive,
-    isAbsolute,
+    isAbsolute
   }: IconProps) => {
   const classNames = concatClassNames([
     styles.icon,

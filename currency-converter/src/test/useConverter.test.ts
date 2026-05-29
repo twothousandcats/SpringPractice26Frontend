@@ -14,8 +14,8 @@ describe('useConverter', () => {
   it('initialized with the first two currencies and amount = 1', () => {
     const { result } = renderHook(() => useConverter());
 
-    expect(result.current.from).toBe(currencies[0].code);
-    expect(result.current.to).toBe(currencies[1].code);
+    expect(result.current.fromCode).toBe(currencies[0].code);
+    expect(result.current.toCode).toBe(currencies[1].code);
     expect(result.current.amount).toBe(1);
   });
 
@@ -33,7 +33,7 @@ describe('useConverter', () => {
     act(() => result.current.setAmount(CONFIG.testingAmountValue));
 
     expect(result.current.amount).toBe(CONFIG.testingAmountValue);
-    expect(result.current.result).toBeCloseTo(CONFIG.testingAmountValue * rate);
+    expect(result.current.conversionResult).toBeCloseTo(CONFIG.testingAmountValue * rate);
   });
 
   it('recalculates result when a pair is changed', () => {
@@ -41,8 +41,8 @@ describe('useConverter', () => {
 
     act(() => result.current.setTo(CONFIG.thirdCurrencyCode));
 
-    expect(result.current.to).toBe(CONFIG.thirdCurrencyCode);
-    expect(result.current.result).toBeCloseTo(priceChanges[CONFIG.firstCurrencyCode][CONFIG.thirdCurrencyCode].price);
+    expect(result.current.toCode).toBe(CONFIG.thirdCurrencyCode);
+    expect(result.current.conversionResult).toBeCloseTo(priceChanges[CONFIG.firstCurrencyCode][CONFIG.thirdCurrencyCode].price);
   });
 
   it('prohibits identical currencies when selecting "to"', () => {
@@ -50,9 +50,9 @@ describe('useConverter', () => {
 
     act(() => result.current.setTo(CONFIG.firstCurrencyCode));
 
-    expect(result.current.to).toBe(CONFIG.firstCurrencyCode);
-    expect(result.current.from).not.toBe(CONFIG.firstCurrencyCode);
-    expect(result.current.from).toBe(CONFIG.secondCurrencyCode);
+    expect(result.current.toCode).toBe(CONFIG.firstCurrencyCode);
+    expect(result.current.fromCode).not.toBe(CONFIG.firstCurrencyCode);
+    expect(result.current.fromCode).toBe(CONFIG.secondCurrencyCode);
   });
 
   it('prohibits identical currencies when selecting "from"', () => {
@@ -60,9 +60,9 @@ describe('useConverter', () => {
 
     act(() => result.current.setFrom(CONFIG.secondCurrencyCode));
 
-    expect(result.current.from).toBe(CONFIG.secondCurrencyCode);
-    expect(result.current.to).not.toBe(CONFIG.secondCurrencyCode);
-    expect(result.current.to).toBe(CONFIG.firstCurrencyCode);
+    expect(result.current.fromCode).toBe(CONFIG.secondCurrencyCode);
+    expect(result.current.toCode).not.toBe(CONFIG.secondCurrencyCode);
+    expect(result.current.toCode).toBe(CONFIG.firstCurrencyCode);
   });
 
   it('swap swaps from/to and recalculates result', () => {
@@ -70,8 +70,8 @@ describe('useConverter', () => {
 
     act(() => result.current.swap());
 
-    expect(result.current.from).toBe(CONFIG.secondCurrencyCode);
-    expect(result.current.to).toBe(CONFIG.firstCurrencyCode);
-    expect(result.current.result).toBeCloseTo(priceChanges[CONFIG.secondCurrencyCode][CONFIG.firstCurrencyCode].price);
+    expect(result.current.fromCode).toBe(CONFIG.secondCurrencyCode);
+    expect(result.current.toCode).toBe(CONFIG.firstCurrencyCode);
+    expect(result.current.conversionResult).toBeCloseTo(priceChanges[CONFIG.secondCurrencyCode][CONFIG.firstCurrencyCode].price);
   });
 });

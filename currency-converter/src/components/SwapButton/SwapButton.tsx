@@ -1,20 +1,20 @@
 import styles from './SwapButton.module.scss';
 
 type SwapButtonProps = {
-    onSwap: () => void;
+  onSwap: () => void;
 }
 
 export const SwapButton = (
-    {
-        onSwap,
-    }: SwapButtonProps
+  {
+    onSwap
+  }: SwapButtonProps
 ) => {
-    return (
-        <button
-            type="button"
-            className={styles.btn}
-            onClick={onSwap}>
-            Swap
-        </button>
-    );
-}
+  return (
+    <button
+      type="button"
+      className={styles.btn}
+      onClick={onSwap}>
+      Swap
+    </button>
+  );
+};

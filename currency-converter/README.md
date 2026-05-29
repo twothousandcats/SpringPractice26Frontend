@@ -1,54 +1,61 @@
-# React + TypeScript + Vite
+# Currency Converter
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Конвертер валют на Vite + React + TypeScript + SCSS Modules.
 
-Currently, two official plugins are available:
+## Запуск
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```bash
+npm i
+npm run dev      # запуск dev-сервера
+npm run build    # production-сборка
+npm run preview  # предпросмотр собранного бандла
+npm run test     # прогон тестов
+npm run lint     # запуск последовательных линтеров (eslint + stylelint)
+npm run lint-fix # автоисправление
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Макет
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Визуальное разбиение макета на компоненты : src/Layout.png
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+## Mocks
+
+Данные в src/mocks/
+
+## Converter Core
+
+Вся логика конвертации инкапсулирована в кастомном хуке
+
+## Тесты
+
+Покрыты тестами
+1. Основная логика useConverter
+2. Рендеры Base
+3. Рендеры DescriptionGroup
+
+## Сценарии тестов
+
+### useConverter
+
+1. Исходное состояние
+2. rate из моков
+3. Перерасчет при измении значения валюты
+4. Перерасчет при измении типа валюты
+5. Запрет одинаковых пар из to(логика)
+6. Запрет одинаковых пар из from(логика)
+7. Проверка работы swap(логика)
+
+### Base component
+
+1. Рендер обоих селектов, сверка данных из моков и рендера списка
+2. Ререндер выходного значения валюты при смене входного значения
+3. Ререндер выходного значения валюты при смене пары
+4. Проверка одинаковых пар(рендер)
+5. Проверка swap(рендер)
+6. Ререндер при смене пары
+
+### DescriptionGroup component
+
+1. Рендер корректного текста кнопки
+2. Рендер ожидаемых описаний
+3. Рендер фолбека при отсутствии описания(исключение ub)
