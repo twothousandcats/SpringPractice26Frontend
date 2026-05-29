@@ -1,0 +1,22 @@
+@use '../../utils/styles/base' as *;
+
+.container {
+  display: flex;
+  inline-size: 100%;
+  max-inline-size: 1257px;
+}
+
+.base {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+
+  padding: 28px;
+
+  background-color: $secondary-background;
+  border-radius: 30px;
+
+  color: $primary-text;
+  font-family: Inter, sans-serif;
+  letter-spacing: 0;
+}

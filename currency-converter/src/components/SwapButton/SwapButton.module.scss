@@ -1,0 +1,22 @@
+@use '../../utils/styles/base' as *;
+
+.btn {
+  inline-size: 100%;
+  padding: 10px;
+
+  background-color: $border-color;
+  border: 1px solid $border-color;
+  border-radius: 23px;
+
+  color: $accent-text;
+  font-size: 22px;
+  line-height: 1;
+
+  transition: background-color 0.3s ease;
+
+  cursor: pointer;
+
+  &:hover {
+    background-color: transparent;
+  }
+}

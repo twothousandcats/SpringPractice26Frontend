@@ -1,0 +1,13 @@
+@use '../../utils/styles/base' as *;
+
+.notFound {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  inline-size: 100%;
+  block-size: 100vh;
+  padding: 20px;
+
+  background-color: $primary-background;
+}

@@ -1,0 +1,20 @@
+@use '../../utils/styles/base' as *;
+
+.descriptionLineWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-block-start: 24px;
+}
+
+.descriptionLineHeading {
+  color: $accent-text;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.descriptionLineText {
+  font-size: 21px;
+  line-height: 1;
+}

@@ -1,0 +1,46 @@
+@use '../../utils/styles/base' as *;
+
+.select {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  inline-size: 100%;
+
+  border: 1px solid $border-color;
+  border-radius: 6px;
+}
+
+.input {
+  min-inline-size: 100px;
+  padding: 15px 20px 15px 30px;
+
+  border: none;
+  outline: none;
+
+  font-size: 22px;
+  line-height: 1;
+}
+
+.separator {
+  display: block;
+  align-self: stretch;
+
+  inline-size: 1px;
+  block-size: auto;
+  margin: 8px 0;
+
+  background-color: $border-color;
+}
+
+.selected {
+  z-index: 1;
+
+  inline-size: 100%;
+  padding: 15px 20px 15px 30px;
+
+  color: $accent-text;
+  font-size: 22px;
+  line-height: 1;
+}
