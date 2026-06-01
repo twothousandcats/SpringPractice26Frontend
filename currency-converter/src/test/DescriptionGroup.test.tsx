@@ -13,6 +13,7 @@ describe('DescriptionGroup', () => {
     render(<DescriptionGroup from={cad} to={pln} />);
 
     const button = screen.getByRole('button', { name: /CAD\/PLN: about/i });
+
     expect(button).toBeInTheDocument();
     expect(button).toHaveAttribute(statusAriaName, 'false');
   });
@@ -21,6 +22,7 @@ describe('DescriptionGroup', () => {
     render(<DescriptionGroup from={cad} to={pln} />);
 
     fireEvent.click(screen.getByRole('button'));
+
     expect(
       screen.getByText(`${cad.name} — ${cad.code} — ${cad.symbol}`)
     ).toBeInTheDocument();
