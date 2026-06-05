@@ -1,0 +1,21 @@
+@use '../../utils/styles/base' as *;
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+
+  text-align: center;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.description {
+  font-size: 14px;
+  color: $accent-text;
+}

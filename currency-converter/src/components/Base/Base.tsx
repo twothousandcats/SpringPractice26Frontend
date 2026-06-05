@@ -3,6 +3,9 @@ import { WorkArea } from '../WorkArea/WorkArea.tsx';
 import { DescriptionGroup } from '../DescriptionGroup/DescriptionGroup.tsx';
 import { useConverter } from '../../hooks/useConverter.ts';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle.ts';
+import { I18n } from '../../utils/config.ts';
+import { concatClassNames } from '../../utils/functions.ts';
+import { StatusScreen } from '../StatusScreen/StatusScreen.tsx';
 
 export const Base = () => {
   const {
@@ -14,23 +17,69 @@ export const Base = () => {
     fromCurrency,
     toCurrency,
     dateTime,
+    isLoading,
+    error,
+    hasData,
     setFrom,
     setTo,
     setAmount,
     swap
   } = useConverter();
-  useDocumentTitle(`Convert from ${fromCurrency.name} to ${toCurrency.name}`);
+  useDocumentTitle(
+    fromCurrency && toCurrency
+      ? `Convert from ${fromCurrency.name} to ${toCurrency.name}`
+      : I18n.en.app.title
+  );
+
+  const baseClasses = concatClassNames([
+    styles.base,
+    styles.container
+  ]);
+
+  if (!hasData) {
+    if (isLoading) {
+      return (
+        <div className={baseClasses}>
+          <StatusScreen
+            variant={'loading'}
+            title={I18n.en.status.loading}
+          />
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className={baseClasses}>
+          <StatusScreen
+            variant={'error'}
+            title={I18n.en.status.serverErrorTitle}
+            description={I18n.en.status.serverErrorDescription}
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className={baseClasses}>
+        <StatusScreen
+          variant={'empty'}
+          title={I18n.en.status.empty}
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className={`${styles.base} ${styles.container}`}>
+    <div className={baseClasses}>
       <WorkArea
         currencies={currencies}
         from={fromCode}
         to={toCode}
         amount={amount}
         result={conversionResult}
-        fromCurrency={fromCurrency}
-        toCurrency={toCurrency}
+        fromCurrency={fromCurrency!}
+        toCurrency={toCurrency!}
         dateTime={dateTime}
         onFromChange={setFrom}
         onToChange={setTo}
@@ -46,8 +95,8 @@ export const Base = () => {
       }
       <DescriptionGroup
         key={`${fromCode}/${toCode}`}
-        from={fromCurrency}
-        to={toCurrency}
+        from={fromCurrency!}
+        to={toCurrency!}
       />
     </div>
   );

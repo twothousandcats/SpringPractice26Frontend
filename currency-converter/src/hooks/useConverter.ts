@@ -1,61 +1,104 @@
-import { useState } from 'react';
-import type { Currency } from '../models/types.ts';
-import { currencies, priceChanges } from '../mocks';
+import { useEffect, useReducer } from 'react';
+import { converterReducer, initialConverterState } from './converterReducer.ts';
+import { fetchCurrencies, fetchPriceChange } from '../api/currency/Api.ts';
+import { useDebouncedValue } from './useDebouncedValue.ts';
 
-const findByCode = (code: string): Currency => {
-  return currencies.find(
-    (currency) => currency.code === code
-  ) ?? currencies[0];
-};
-
-const firstDifferentCode = (code: string): string => {
-  return (currencies.find((currency) => currency.code !== code) ?? currencies[0]).code;
-};
+const toMessage = (error: unknown): string =>
+  error instanceof Error
+    ? error.message
+    : 'Unknown error';
 
 export const useConverter = () => {
-  const [fromCode, setFromCode] = useState<string>(currencies[0].code);
-  const [toCode, setToCode] = useState<string>(currencies[1].code);
-  const [amount, setAmount] = useState<number>(1);
+  const [state, dispatch] = useReducer(converterReducer, initialConverterState);
+  const {
+    isLoading,
+    currencies,
+    priceChange,
+    error,
+    fromCode,
+    toCode,
+    amount
+  } = state;
 
-  const setFrom = (code: string): void => {
-    setFromCode(code);
-    if (code === toCode) {
-      setToCode(firstDifferentCode(code));
+  // get /Currency - init
+  useEffect(() => {
+    let cancelled = false;
+    dispatch({
+      type: 'FETCH_START'
+    });
+
+    fetchCurrencies()
+      .then((data) => {
+        if (!cancelled) {
+          dispatch({ type: 'CURRENCIES_LOADED', payload: data });
+        }
+      })
+      .catch((e) => {
+        if (!cancelled) {
+          dispatch({ type: 'FETCH_ERROR', payload: toMessage(e) });
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const requestKey = useDebouncedValue(`${fromCode}|${toCode}|${amount}`, 300);
+
+  useEffect(() => {
+    const [from, to] = requestKey.split('|');
+    if (!from || !to) {
+      return;
     }
-  };
 
-  const setTo = (code: string): void => {
-    setToCode(code);
-    if (code === fromCode) {
-      setFromCode(firstDifferentCode(code));
-    }
-  };
+    let cancelled = false;
+    dispatch({ type: 'FETCH_START' });
 
-  const swap = (): void => {
-    setFromCode(toCode);
-    setToCode(fromCode);
-  };
+    fetchPriceChange({ purchasedCurrency: from, paymentCurrency: to })
+      .then((changes) => {
+        if (!cancelled) {
+          const latest = changes.length > 0
+            ? changes[changes.length - 1]
+            : null;
+          dispatch({ type: 'PRICE_LOADED', payload: latest });
+        }
+      })
+      .catch((e) => {
+        if (!cancelled) {
+          dispatch({ type: 'FETCH_ERROR', payload: toMessage(e) });
+        }
+      });
 
-  const rate = priceChanges[fromCode]?.[toCode]?.price ?? 0;
+    return () => {
+      cancelled = true;
+    };
+  }, [requestKey]);
+
+  const fromCurrency = currencies.find(currency => currency.code === fromCode);
+  const toCurrency = currencies.find(currency => currency.code === toCode);
+  const rate = priceChange?.price ?? 0;
   const conversionResult = amount * rate;
-
-  const fromCurrency = findByCode(fromCode);
-  const toCurrency = findByCode(toCode);
-  const dateTime = priceChanges[fromCode]?.[toCode]?.dateTime ?? '';
+  const dateTime = priceChange?.dateTime ?? '';
 
   return {
     currencies,
     fromCode,
     toCode,
     amount,
-    conversionResult,
     rate,
+    conversionResult,
     fromCurrency,
     toCurrency,
-    setFrom,
-    setTo,
-    setAmount,
-    swap,
-    dateTime
+    dateTime,
+    // states
+    isLoading,
+    error,
+    hasData: currencies.length > 0,
+    // actions
+    setFrom: (code: string) => dispatch({ type: 'SET_FROM', payload: code }),
+    setTo: (code: string) => dispatch({ type: 'SET_TO', payload: code }),
+    setAmount: (value: number) => dispatch({ type: 'SET_AMOUNT', payload: value }),
+    swap: () => dispatch({ type: 'SWAP' })
   };
 };
