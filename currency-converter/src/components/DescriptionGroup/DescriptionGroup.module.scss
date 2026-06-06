@@ -1,0 +1,50 @@
+@use '../../utils/styles/base' as *;
+
+.descriptionGroup {
+  display: flex;
+  flex-direction: column;
+  inline-size: 100%;
+}
+
+.btnContainer {
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  inline-size: 100%;
+
+  &::after {
+    content: '';
+
+    position: absolute;
+    z-index: 1;
+
+    inline-size: 100%;
+    block-size: 1px;
+
+    background-color: $border-color;
+  }
+}
+
+.descriptionLinesSeparator {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
+
+  &Show {
+    grid-template-rows: 1fr;
+  }
+}
+
+.collapseInner {
+  min-block-size: 0;
+  overflow: hidden;
+}
