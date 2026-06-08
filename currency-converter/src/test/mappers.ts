@@ -24,7 +24,7 @@ describe('mapCurrencyDtoToCurrency', () => {
         });
     });
 
-    it('does not retures the same ref as DTO', () => {
+    it('does not return the same ref as DTO', () => {
         // Arrange
         const dto: CurrencyDTO = {
             code: 'CAD',
@@ -63,7 +63,7 @@ describe('mapPriceChangeDtoToPriceChange', () => {
         });
     });
 
-    it('does not retures the same ref as DTO', () => {
+    it('does not return the same ref as DTO', () => {
         // Arrange
         const dto: PriceChangeDTO = {
             purchasedCurrencyCode: 'JPY',
