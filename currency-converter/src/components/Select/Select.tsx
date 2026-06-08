@@ -33,14 +33,14 @@ export const Select = (
     const containerRef = useRef<HTMLDivElement>(null);
 
     const [draft, setDraft] = useState<string>(String(value));
-    useEffect(() => {
-        if (readOnly) {
-            return;
-        }
-        if (String(value) !== draft) {
+    const [lastSyncedValue, setLastSyncedValue] = useState<number>(value);
+
+    if (!readOnly && value !== lastSyncedValue) {
+        setLastSyncedValue(value);
+        if (Number(draft) !== value) {
             setDraft(String(value));
         }
-    }, [value, readOnly]);
+    }
 
     useEffect(() => {
         if (!isOpen) {
