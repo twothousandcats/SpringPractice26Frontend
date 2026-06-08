@@ -9,5 +9,5 @@ export type PriceChangeDTO = {
   purchasedCurrencyCode: string;
   paymentCurrencyCode: string;
   price: number;
-  dataTime: string;
+  dateTime: string;
 }

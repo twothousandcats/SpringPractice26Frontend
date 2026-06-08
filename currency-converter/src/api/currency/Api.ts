@@ -20,23 +20,23 @@ export const fetchCurrencies = async (): Promise<Currency[]> => {
 export type FetchPriceChangesParams = {
   purchasedCurrency: string;
   paymentCurrency: string;
-  fromDataTime?: string;
-  toDataTime?: string;
+  fromDateTime?: string;
+  toDateTime?: string;
 };
 
 const DEFAULT_HISTORY_MS = 60 * 60 * 1000;
 export const fetchPriceChange = async (
   params: FetchPriceChangesParams
 ): Promise<PriceChange[]> => {
-  const fromDataTime = params.fromDataTime ?? new Date(Date.now() - DEFAULT_HISTORY_MS).toISOString();
+  const fromDateTime = params.fromDateTime ?? new Date(Date.now() - DEFAULT_HISTORY_MS).toISOString();
 
   const query = new URLSearchParams({
     paymentCurrency: params.paymentCurrency,
     purchasedCurrency: params.purchasedCurrency,
-    fromDataTime
+    fromDateTime
   });
-  if (params.toDataTime) {
-    query.set('toDataTime', params.toDataTime);
+  if (params.toDateTime) {
+    query.set('toDataTime', params.toDateTime);
   }
 
   const dto = await request<PriceChangeDTO[]>(

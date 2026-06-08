@@ -12,5 +12,5 @@ export const mapPriceChangeDtoToPriceChange = (dto: PriceChangeDTO): PriceChange
   purchasedCurrencyCode: dto.purchasedCurrencyCode,
   paymentCurrencyCode: dto.paymentCurrencyCode,
   price: dto.price,
-  dateTime: dto.dataTime
+  dateTime: dto.dateTime
 });
