@@ -42,7 +42,7 @@ export const Base = () => {
         <div className={baseClasses}>
           <StatusScreen
             variant={'loading'}
-            title={I18n.en.status.loading}
+            text={I18n.en.status.loading}
           />
         </div>
       );
@@ -53,8 +53,7 @@ export const Base = () => {
         <div className={baseClasses}>
           <StatusScreen
             variant={'error'}
-            title={I18n.en.status.serverErrorTitle}
-            description={I18n.en.status.serverErrorDescription}
+            text={I18n.en.status.serverError}
           />
         </div>
       );
@@ -64,7 +63,7 @@ export const Base = () => {
       <div className={baseClasses}>
         <StatusScreen
           variant={'empty'}
-          title={I18n.en.status.empty}
+          text={I18n.en.status.empty}
         />
       </div>
     );

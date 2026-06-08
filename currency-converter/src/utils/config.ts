@@ -25,8 +25,7 @@ export const I18n = {
     },
     status: {
       loading: 'Loading currencies...',
-      serverErrorTitle: 'Something went wrong on the server side.',
-      serverErrorDescription: 'Please make sure the backend is running and try again later.',
+      serverError: 'Could not get data from the server.',
       empty: 'No currencies available.'
     }
   }

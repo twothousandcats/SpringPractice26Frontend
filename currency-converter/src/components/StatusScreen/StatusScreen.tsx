@@ -2,25 +2,20 @@ import styles from './StatusScreen.module.scss';
 
 type StatusScreenProps = {
   variant: 'loading' | 'error' | 'empty';
-  title: string;
-  description?: string;
+  text: string;
   testId?: string;
 };
 
 export const StatusScreen = (
   {
     variant,
-    title,
-    description,
+    text,
     testId
   }: StatusScreenProps) => {
   return (
     <div className={styles.screen}
          data-testid={testId ?? `status-${variant}`}>
-      <p className={styles.title}>{title}</p>
-      {description && (
-        <p className={styles.description}>{description}</p>
-      )}
+      <p className={styles.title}>{text}</p>
     </div>
   );
 };
