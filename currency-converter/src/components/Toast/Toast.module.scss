@@ -1,7 +1,9 @@
 .toast {
   display: flex;
+
+  &.active {
+
+  }
 }
 
 .message {}
-
-.closeButton {}

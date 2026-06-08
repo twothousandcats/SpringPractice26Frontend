@@ -1,20 +1,26 @@
 import styles from './Toast.module.scss';
+import {concatClassNames} from "../../utils/functions.ts";
 
 type ToastProps = {
-  message: string;
-  onClose?: () => void;
+    message: string;
+    isActive?: boolean;
 }
 
 export const Toast = (
-  {
-    message,
-    // onClose
-  }: ToastProps) => {
-  return (
-    <div className={styles.toast}
-         role="alert"
-         data-testid="toast">
-      <p className={styles.message}>{message}</p>
-    </div>
-  );
+    {
+        message,
+        isActive
+    }: ToastProps) => {
+    const classes = concatClassNames([
+        styles.toast,
+        isActive && styles.active
+    ]);
+
+    return (
+        <div className={classes}
+             role="alert"
+             data-testid="toast">
+            <p className={styles.message}>{message}</p>
+        </div>
+    );
 };
