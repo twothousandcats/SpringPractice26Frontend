@@ -13,7 +13,10 @@ const loadedState = {
 describe('converterReducer: currencies', () => {
     it('CURRENCIES_FETCH_START sets isLoading and clears initError', () => {
         // Arrange
-        const state = {...initialConverterState, initError: 'smth'};
+        const state = {
+            ...initialConverterState,
+            initError: 'smth'
+        };
 
         // Act
         const nextState = converterReducer(

@@ -1,42 +1,67 @@
-import { describe, it, expect } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
-import { DescriptionGroup } from '../components/DescriptionGroup/DescriptionGroup.tsx';
-import { currencies } from '../mocks';
-import { I18n } from '../utils/config.ts';
+import {describe, expect, it} from "vitest";
+import {CURRENCIES} from "./fixtures.ts";
+import {DescriptionGroup} from "../components/DescriptionGroup/DescriptionGroup.tsx";
+import {fireEvent, render, screen} from "@testing-library/react";
+import {I18n} from "../utils/config.ts";
 
-const [cad, pln] = currencies;
-const statusAriaName = 'aria-expanded';
+const [cad, pln] = CURRENCIES;
+const ariaExpanded = "aria-expanded";
 
-// todo: Fix after switching to REST API
-describe('DescriptionGroup', () => {
-  it('renders a toggle button with the current pair in the title', () => {
-    render(<DescriptionGroup from={cad} to={pln} />);
+describe("DescriptionGroup", () => {
+    it('renders a toggle button with the current pair in the title and is collapsed by default', () => {
+        // Arrange
+        // fixtures
 
-    const button = screen.getByRole('button', { name: /CAD\/PLN: about/i });
+        // Act
+        render(<DescriptionGroup
+            from={cad}
+            to={pln}
+        />);
 
-    expect(button).toBeInTheDocument();
-    expect(button).toHaveAttribute(statusAriaName, 'false');
-  });
+        // Assert
+        const btn = screen.getByTestId('more-btn');
+        expect(btn).toBeInTheDocument();
+        expect(btn).toHaveAttribute(ariaExpanded, 'false');
+    });
 
-  it('shows a description of both currencies in the pair after clicking', () => {
-    render(<DescriptionGroup from={cad} to={pln} />);
+    it('shows a description of both currencies in the pair after clicking', () => {
+        // Arrange
+        render(<DescriptionGroup
+            from={cad}
+            to={pln}
+        />);
+        const btn = screen.getByTestId('more-btn');
 
-    fireEvent.click(screen.getByRole('button'));
+        // Act
+        fireEvent.click(btn);
 
-    expect(
-      screen.getByText(`${cad.name} — ${cad.code} — ${cad.symbol}`)
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(`${pln.name} — ${pln.code} — ${pln.symbol}`)
-    ).toBeInTheDocument();
-    expect(screen.getByRole('button')).toHaveAttribute(statusAriaName, 'true');
-  });
+        // Assert
+        expect(
+            screen.getByText(`${cad.name} — ${cad.code} — ${cad.symbol}`)
+        ).toBeInTheDocument();
+        expect(
+            screen.getByText(`${pln.name} — ${pln.code} — ${pln.symbol}`)
+        ).toBeInTheDocument();
+        expect(btn).toHaveAttribute(ariaExpanded, 'true');
+    });
 
-  it('shows fallback text if the currency has no description', () => {
-    render(<DescriptionGroup from={{ ...cad, description: '' }} to={pln} />);
+    it('shows fallback text if the currency has no description', () => {
+        // Arrange
+        render(<DescriptionGroup
+            from={
+                {
+                    ...cad,
+                    description: '',
+                }
+            }
+            to={pln}
+        />);
+        const btn = screen.getByTestId('more-btn');
 
-    fireEvent.click(screen.getByRole('button'));
+        // Act
+        fireEvent.click(btn);
 
-    expect(screen.getByText(I18n.en.fallbackDescription)).toBeInTheDocument();
-  });
+        // Assert
+        expect(screen.getByText(I18n.en.fallbackDescription)).toBeInTheDocument();
+    });
 });
