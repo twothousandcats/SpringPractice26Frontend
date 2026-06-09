@@ -21,8 +21,6 @@ const errorResponse = (status = 500): Response => (
 const mockFetch = (impl: (url: string) => Promise<Response>) => {
     const fn = vi.fn(impl);
     globalThis.fetch = fn as unknown as typeof fetch;
-
-    return fn;
 };
 
 describe('Base UI states', () => {
