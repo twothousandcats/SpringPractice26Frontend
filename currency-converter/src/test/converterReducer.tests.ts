@@ -2,7 +2,6 @@ import {converterReducer, initialConverterState} from "../hooks/converterReducer
 import {CURRENCIES, PRICE_CHANGE} from "./fixtures.ts";
 import {describe, expect, it} from "vitest";
 
-
 const loadedState = {
     ...initialConverterState,
     initialized: true,
