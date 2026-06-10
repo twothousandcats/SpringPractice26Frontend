@@ -1,4 +1,6 @@
-.selectionGroup {
+@use '../../utils/styles/base' as *;
+
+.group {
   display: flex;
   flex-direction: column;
   gap: 22px;
@@ -6,4 +8,25 @@
 
   inline-size: 100%;
   max-inline-size: 600px;
+}
+
+.btn {
+  inline-size: 100%;
+  padding: 10px;
+
+  background-color: $border-color;
+  border: 1px solid $border-color;
+  border-radius: 23px;
+
+  color: $accent-text;
+  font-size: 22px;
+  line-height: 1;
+
+  transition: background-color 0.3s ease;
+
+  cursor: pointer;
+
+  &:hover {
+    background-color: transparent;
+  }
 }
