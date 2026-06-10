@@ -1,7 +1,7 @@
 import type {CurrencyDTO, PriceChangeDTO} from '../dto.ts';
 import type {Currency, PriceChange} from '../../models/types.ts';
 import {mapCurrencyDtoToCurrency, mapPriceChangeDtoToPriceChange} from '../mappers.ts';
-import {ENV_CONFIG} from '../../utils/config.ts';
+import {CONFIG, ENV_CONFIG} from '../../utils/config.ts';
 
 const request = async <T>(url: string, signal?: AbortSignal): Promise<T> => {
     const response = await fetch(url, {signal});
@@ -25,7 +25,7 @@ export type FetchPriceChangesParams = {
     toDateTime?: string;
 };
 
-const DEFAULT_HISTORY_MS = 60 * 60 * 1000;
+const DEFAULT_HISTORY_MS = CONFIG.settings.millisecondsPerHour;
 export const fetchPriceChange = async (
     params: FetchPriceChangesParams,
     signal?: AbortSignal

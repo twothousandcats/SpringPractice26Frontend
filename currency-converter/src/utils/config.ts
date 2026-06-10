@@ -4,6 +4,8 @@ export const ENV_CONFIG = {
     }
 };
 
+const second = 1000;
+const secondPerMinute = 60;
 export const CONFIG = {
     paths: {
         main: '/'
@@ -13,6 +15,10 @@ export const CONFIG = {
     settings: {
         debounceDelayMs: 300,
         toastDelayMs: 4000,
+        // from ms
+        millisecondsPerSecond: second,
+        millisecondsPerMinute: secondPerMinute * second,
+        millisecondsPerHour: secondPerMinute * secondPerMinute * second,
     },
 };
 

@@ -1,16 +1,20 @@
 import {Base} from "../components/Base/Base.tsx";
-import {act, render, screen, waitFor} from "@testing-library/react";
+import {render, screen, waitFor} from "@testing-library/react";
 import {CURRENCIES_DTO, PRICE_CHANGE_DTO} from "./fixtures.ts";
 
+const STATUS_CODES = {
+    correct: 200,
+    serverError: 500,
+};
 const okResponse = (body: unknown): Response => (
     {
         ok: true,
-        status: 200,
+        status: STATUS_CODES.correct,
         json: async () => body
     }
 ) as Response;
 
-const errorResponse = (status = 500): Response => (
+const errorResponse = (status = STATUS_CODES.serverError): Response => (
     {
         ok: false,
         status,
@@ -51,7 +55,7 @@ describe('Base UI states', () => {
 
     it('shows full-screen error when currencies fetch fails', async () => {
         // Arrange
-        mockFetch(async () => errorResponse(500));
+        mockFetch(async () => errorResponse(STATUS_CODES.serverError));
 
         // Act
         render(<Base/>);
@@ -84,11 +88,6 @@ describe('Base UI states', () => {
                 expect(screen.getByTestId('amount-input')).toBeInTheDocument();
             }
         );
-        await act(
-            async () => {
-                await vi.advanceTimersByTimeAsync(400);
-            }
-        );
 
         // Assert
         await waitFor(
@@ -105,7 +104,7 @@ describe('Base UI states', () => {
                     return okResponse(CURRENCIES_DTO);
                 }
                 if (url.includes('/prices')) {
-                    return errorResponse(500);
+                    return errorResponse(STATUS_CODES.serverError);
                 }
 
                 throw new Error(`unexpected url ${url}`);
@@ -116,9 +115,6 @@ describe('Base UI states', () => {
         render(<Base/>);
         await waitFor(() => {
             expect(screen.getByTestId('amount-input')).toBeInTheDocument();
-        });
-        await act(async () => {
-            await vi.advanceTimersByTimeAsync(400);
         });
 
         // Assert

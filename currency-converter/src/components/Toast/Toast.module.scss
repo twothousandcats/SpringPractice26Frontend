@@ -2,17 +2,18 @@
 
 .toast {
   position: fixed;
-  top: 0;
-  left: 50%;
+  inset-block-start: 0;
+  inset-inline-start: 50%;
   z-index: 1;
 
-  max-width: 60%;
   display: flex;
-  padding: 20px;
-  margin: 0 auto;
 
-  border-radius: 10px;
+  max-inline-size: 60%;
+  margin: 0 auto;
+  padding: 20px;
+
   background-color: $error-background;
+  border-radius: 10px;
 
   color: $accent-text;
   text-transform: uppercase;
@@ -25,4 +26,6 @@
 }
 
 .message {
+  color: inherit;
+  text-transform: inherit;
 }

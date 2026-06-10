@@ -271,17 +271,18 @@ describe('converterReducer: amount', () => {
     it('SET_AMOUNT writes the amount', () => {
         // Arrange
         const state = loadedState;
+        const amount = 40;
 
         // Act
         const next = converterReducer(
             state,
             {
                 type: 'SET_AMOUNT',
-                payload: 42
+                payload: amount
             }
         );
 
         // Assert
-        expect(next.amount).toBe(42);
+        expect(next.amount).toBe(amount);
     });
 });
