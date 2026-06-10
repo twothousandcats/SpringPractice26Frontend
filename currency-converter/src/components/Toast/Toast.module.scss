@@ -1,9 +1,28 @@
+@use '../../utils/styles/base' as *;
+
 .toast {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  z-index: 1;
+
+  max-width: 60%;
   display: flex;
+  padding: 20px;
+  margin: 0 auto;
+
+  border-radius: 10px;
+  background-color: $error-background;
+
+  color: $accent-text;
+  text-transform: uppercase;
+
+  transform: translate(-50%, -100%);
 
   &.active {
-
+    transform: translate(-50%, 40px);
   }
 }
 
-.message {}
+.message {
+}

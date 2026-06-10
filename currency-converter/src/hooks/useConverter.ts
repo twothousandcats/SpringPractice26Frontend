@@ -1,13 +1,16 @@
-import {useEffect, useReducer} from 'react';
+import {useEffect, useReducer, useRef} from 'react';
 import {converterReducer, initialConverterState} from './converterReducer.ts';
 import {fetchCurrencies, fetchPriceChange} from '../api/currency/Api.ts';
-import {useDebouncedValue} from './useDebouncedValue.ts';
 import {CONFIG} from "../utils/config.ts";
 
 const toMessage = (error: unknown): string =>
     error instanceof Error
         ? error.message
         : 'Unknown error';
+
+const isAbortError = (error: unknown): boolean =>
+    error instanceof DOMException && error.name === 'AbortError';
+
 
 export const useConverter = () => {
     const [state, dispatch] = useReducer(converterReducer, initialConverterState);
@@ -25,50 +28,66 @@ export const useConverter = () => {
 
     // get /Currency - init
     useEffect(() => {
-        let cancelled = false;
+        const abortController = new AbortController();
         dispatch({type: 'CURRENCIES_FETCH_START'});
 
-        fetchCurrencies()
-            .then((data) => {
-                if (!cancelled) dispatch({type: 'CURRENCIES_LOADED', payload: data});
-            })
+        fetchCurrencies(abortController.signal)
+            .then((data) => dispatch({type: 'CURRENCIES_LOADED', payload: data}))
             .catch((e) => {
-                if (!cancelled) dispatch({type: 'CURRENCIES_ERROR', payload: toMessage(e)});
+                if (isAbortError(e)) {
+                    return
+                }
+
+                dispatch({type: 'CURRENCIES_ERROR', payload: toMessage(e)});
             });
 
-        return () => {
-            cancelled = true;
-        };
+        return () => abortController.abort();
     }, []);
 
-    const debouncedAmount = useDebouncedValue(amount, CONFIG.settings.debounceDelayMs);
-    const requestKey = `${fromCode}|${toCode}|${debouncedAmount}`;
+    const requestKey = `${fromCode}|${toCode}|${amount}`;
+    const isFirstPriceRequest = useRef<boolean>(true);
 
+    // todo: cancelled -> AbortController
+    // todo: первая загрузка данных без debounced
+    // get /price - init
     useEffect(() => {
         const [from, to] = requestKey.split('|');
         if (!from || !to) {
             return;
         }
 
-        let cancelled = false;
-        dispatch({type: 'PRICE_FETCH_START'});
-        fetchPriceChange({purchasedCurrency: from, paymentCurrency: to})
-            .then((changes) => {
-                if (cancelled) {
-                    return;
-                }
-                const latest = changes.length > 0 ? changes[changes.length - 1] : null;
-                dispatch({type: 'PRICE_LOADED', payload: latest});
-            })
-            .catch((e) => {
-                if (!cancelled) {
-                    dispatch({type: 'PRICE_ERROR', payload: toMessage(e)});
-                }
-            });
+        const abortController = new AbortController();
+        const run = () => {
+            dispatch({type: 'PRICE_FETCH_START'});
+            fetchPriceChange(
+                {purchasedCurrency: from, paymentCurrency: to},
+                abortController.signal
+            )
+                .then((changes) => {
+                    const latest = changes.length > 0 ? changes[changes.length - 1] : null;
+                    dispatch({type: 'PRICE_LOADED', payload: latest});
+                })
+                .catch((e) => {
+                    if (isAbortError(e)) {
+                        return;
+                    }
 
-        return () => {
-            cancelled = true;
+                    dispatch({type: 'PRICE_ERROR', payload: toMessage(e)});
+                });
         };
+
+        if (isFirstPriceRequest.current) {
+            isFirstPriceRequest.current = false;
+            run();
+
+            return () => abortController.abort();
+        }
+
+        const timer = setInterval(run, CONFIG.settings.debounceDelayMs);
+        return () => {
+            clearTimeout(timer);
+            abortController.abort();
+        }
     }, [requestKey]);
 
     const fromCurrency = currencies.find(currency => currency.code === fromCode);
