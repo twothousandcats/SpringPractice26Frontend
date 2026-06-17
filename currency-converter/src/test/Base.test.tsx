@@ -1,89 +1,126 @@
-import { describe, it, expect } from 'vitest';
-import { fireEvent, render, screen, within } from '@testing-library/react';
-import { Base } from '../components/Base/Base.tsx';
-import { currencies, priceChanges } from '../mocks';
+import {Base} from "../components/Base/Base.tsx";
+import {render, screen, waitFor} from "@testing-library/react";
+import {CURRENCIES_DTO, PRICE_CHANGE_DTO} from "./fixtures.ts";
 
-const CONFIG = {
-  testingAmountValue: 10,
-  firstCurrencyCode: 'CAD',
-  secondCurrencyCode: 'PLN',
-  thirdCurrencyCode: 'JPY',
-  selectors: {
-    fromSelect: 'from-select',
-    toSelect: 'to-select',
-    amountInput: 'amount-input',
-    resultInput: 'result-input'
-  },
-  statusArias: {
-    moreBtn: 'aria-expanded'
-  }
+const STATUS_CODES = {
+    correct: 200,
+    serverError: 500,
+};
+const okResponse = (body: unknown): Response => (
+    {
+        ok: true,
+        status: STATUS_CODES.correct,
+        json: async () => body
+    }
+) as Response;
+
+const errorResponse = (status = STATUS_CODES.serverError): Response => (
+    {
+        ok: false,
+        status,
+        json: async () => ({})
+    }
+) as Response;
+
+const mockFetch = (impl: (url: string) => Promise<Response>) => {
+    const fn = vi.fn(impl);
+    globalThis.fetch = fn as unknown as typeof fetch;
 };
 
-// todo: refactor
-describe('Base (converter integration)', () => {
-  it('renders both selects and fields filled with mocks', () => {
-    render(<Base />);
-
-    const fromSelect = screen.getByTestId(CONFIG.selectors.fromSelect);
-    const toSelect = screen.getByTestId(CONFIG.selectors.toSelect);
-
-    expect(within(fromSelect).getAllByText(CONFIG.firstCurrencyCode).length).toBeGreaterThan(0);
-    expect(within(toSelect).getAllByText(CONFIG.secondCurrencyCode).length).toBeGreaterThan(0);
-
-    currencies.forEach(({ code }) => {
-      expect(within(fromSelect).getAllByText(code).length).toBeGreaterThan(0);
-      expect(within(toSelect).getAllByText(code).length).toBeGreaterThan(0);
+describe('Base UI states', () => {
+    beforeEach(() => {
+        vi.useFakeTimers(
+            {
+                shouldAdvanceTime: true
+            }
+        );
     });
 
-    expect(screen.getByTestId(CONFIG.selectors.amountInput)).toHaveValue(1);
-    expect(screen.getByTestId(CONFIG.selectors.resultInput)).toHaveValue(
-      priceChanges[CONFIG.firstCurrencyCode][CONFIG.secondCurrencyCode].price
-    );
-  });
+    afterEach(() => {
+        vi.useRealTimers();
+        vi.restoreAllMocks();
+    });
 
-  it('rerenders the result when the sum changes', () => {
-    render(<Base />);
+    it('shows loading screen while currencies are loading', () => {
+        // Arrange
+        mockFetch(() => new Promise(() => {
+        }));
 
-    fireEvent.change(screen.getByTestId(CONFIG.selectors.amountInput), { target: { value: CONFIG.testingAmountValue.toString() } });
+        // Act
+        render(<Base/>);
 
-    expect(screen.getByTestId(CONFIG.selectors.amountInput)).toHaveValue(CONFIG.testingAmountValue);
-    expect(screen.getByTestId(CONFIG.selectors.resultInput)).toHaveValue(CONFIG.testingAmountValue * priceChanges[CONFIG.firstCurrencyCode][CONFIG.secondCurrencyCode].price);
-  });
+        // Assert
+        expect(screen.getByTestId('status-loading')).toBeInTheDocument();
+    });
 
-  it('rerenders the result when changing the currency in "to"', () => {
-    render(<Base />);
+    it('shows full-screen error when currencies fetch fails', async () => {
+        // Arrange
+        mockFetch(async () => errorResponse(STATUS_CODES.serverError));
 
-    fireEvent.click(within(screen.getByTestId(CONFIG.selectors.toSelect)).getByText(CONFIG.thirdCurrencyCode));
+        // Act
+        render(<Base/>);
 
-    expect(screen.getByTestId(CONFIG.selectors.resultInput)).toHaveValue(priceChanges[CONFIG.firstCurrencyCode][CONFIG.thirdCurrencyCode].price);
-  });
+        // Assert
+        await waitFor(() => {
+            expect(screen.getByTestId('status-error')).toBeInTheDocument();
+        });
+    });
 
-  it('does not allow identical pairs: choosing "to" = current "from" shifts "from"', () => {
-    render(<Base />);
+    it('renders WorkArea after currencies and price are loaded', async () => {
+        // Arrange
+        mockFetch(
+            async (url) => {
+                if (url.includes('/Currency')) {
+                    return okResponse(CURRENCIES_DTO);
+                }
+                if (url.includes('/prices')) {
+                    return okResponse([PRICE_CHANGE_DTO]);
+                }
 
-    fireEvent.click(within(screen.getByTestId(CONFIG.selectors.toSelect)).getByText(CONFIG.firstCurrencyCode));
+                throw new Error(`unexpected url ${url}`);
+            }
+        );
 
-    expect(screen.getByTestId(CONFIG.selectors.resultInput)).toHaveValue(priceChanges[CONFIG.secondCurrencyCode][CONFIG.firstCurrencyCode].price);
-  });
+        // Act
+        render(<Base/>);
+        await waitFor(
+            () => {
+                expect(screen.getByTestId('amount-input')).toBeInTheDocument();
+            }
+        );
 
-  it('swaps the pair and rerenders the result', () => {
-    render(<Base />);
+        // Assert
+        await waitFor(
+            () => {
+                expect(screen.getByTestId('result-input')).toHaveValue(PRICE_CHANGE_DTO.price);
+            }
+        );
+    });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Swap' }));
+    it('keeps the app working and shows Toast when /prices fails after init', async () => {
+        // Arrange
+        mockFetch(async (url) => {
+                if (url.includes('/Currency')) {
+                    return okResponse(CURRENCIES_DTO);
+                }
+                if (url.includes('/prices')) {
+                    return errorResponse(STATUS_CODES.serverError);
+                }
 
-    expect(screen.getByTestId(CONFIG.selectors.resultInput)).toHaveValue(priceChanges[CONFIG.secondCurrencyCode][CONFIG.firstCurrencyCode].price);
-  });
+                throw new Error(`unexpected url ${url}`);
+            }
+        );
 
-  it('reset open/closed descriptions by changing pair', () => {
-    render(<Base />);
+        // Act
+        render(<Base/>);
+        await waitFor(() => {
+            expect(screen.getByTestId('amount-input')).toBeInTheDocument();
+        });
 
-    fireEvent.click(screen.getByRole('button', { name: /CAD\/PLN: about/i }));
-    expect(screen.getByText(currencies[0].description)).toBeInTheDocument();
-
-    fireEvent.click(within(screen.getByTestId(CONFIG.selectors.toSelect)).getByText(CONFIG.thirdCurrencyCode));
-
-    expect(
-      screen.getByRole('button', { name: /CAD\/JPY: about/i })
-    ).toHaveAttribute(CONFIG.statusArias.moreBtn, 'false');
-  });
+        // Assert
+        await waitFor(() => {
+            const toast = screen.getByTestId('toast');
+            expect(toast).toHaveTextContent(/failed with status 500/i);
+        });
+    });
 });

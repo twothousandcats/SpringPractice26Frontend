@@ -12,6 +12,7 @@ export const MoreButton = ({ title, isOpen, onToggle }: MoreButtonProps) => {
   return (
     <button
       type="button"
+      data-testid="more-btn"
       className={styles.moreButton}
       aria-expanded={isOpen}
       onClick={onToggle}

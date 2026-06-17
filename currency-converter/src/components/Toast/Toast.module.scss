@@ -1,0 +1,31 @@
+@use '../../utils/styles/base' as *;
+
+.toast {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline-start: 50%;
+  z-index: 1;
+
+  display: flex;
+
+  max-inline-size: 60%;
+  margin: 0 auto;
+  padding: 20px;
+
+  background-color: $error-background;
+  border-radius: 10px;
+
+  color: $accent-text;
+  text-transform: uppercase;
+
+  transform: translate(-50%, -100%);
+
+  &.active {
+    transform: translate(-50%, 40px);
+  }
+}
+
+.message {
+  color: inherit;
+  text-transform: inherit;
+}

@@ -1,61 +1,124 @@
-import { useState } from 'react';
-import type { Currency } from '../models/types.ts';
-import { currencies, priceChanges } from '../mocks';
+import {useEffect, useReducer, useRef} from 'react';
+import {converterReducer, initialConverterState} from './converterReducer.ts';
+import {fetchCurrencies, fetchPriceChange} from '../api/currency/Api.ts';
+import {CONFIG} from "../utils/config.ts";
 
-const findByCode = (code: string): Currency => {
-  return currencies.find(
-    (currency) => currency.code === code
-  ) ?? currencies[0];
-};
+const toMessage = (error: unknown): string =>
+    error instanceof Error
+        ? error.message
+        : 'Unknown error';
 
-const firstDifferentCode = (code: string): string => {
-  return (currencies.find((currency) => currency.code !== code) ?? currencies[0]).code;
-};
+const isAbortError = (error: unknown): boolean =>
+    error instanceof DOMException && error.name === 'AbortError';
+
 
 export const useConverter = () => {
-  const [fromCode, setFromCode] = useState<string>(currencies[0].code);
-  const [toCode, setToCode] = useState<string>(currencies[1].code);
-  const [amount, setAmount] = useState<number>(1);
+    const [state, dispatch] = useReducer(converterReducer, initialConverterState);
+    const {
+        isLoading,
+        initialized,
+        currencies,
+        priceChange,
+        initError,
+        runtimeError,
+        fromCode,
+        toCode,
+        amount
+    } = state;
 
-  const setFrom = (code: string): void => {
-    setFromCode(code);
-    if (code === toCode) {
-      setToCode(firstDifferentCode(code));
-    }
-  };
+    // get /Currency - init
+    useEffect(() => {
+        const abortController = new AbortController();
+        dispatch({type: 'CURRENCIES_FETCH_START'});
 
-  const setTo = (code: string): void => {
-    setToCode(code);
-    if (code === fromCode) {
-      setFromCode(firstDifferentCode(code));
-    }
-  };
+        fetchCurrencies(abortController.signal)
+            .then((data) => dispatch({type: 'CURRENCIES_LOADED', payload: data}))
+            .catch((e) => {
+                if (isAbortError(e)) {
+                    return
+                }
 
-  const swap = (): void => {
-    setFromCode(toCode);
-    setToCode(fromCode);
-  };
+                dispatch({type: 'CURRENCIES_ERROR', payload: toMessage(e)});
+            });
 
-  const rate = priceChanges[fromCode]?.[toCode]?.price ?? 0;
-  const conversionResult = amount * rate;
+        return () => abortController.abort();
+    }, []);
 
-  const fromCurrency = findByCode(fromCode);
-  const toCurrency = findByCode(toCode);
-  const dateTime = priceChanges[fromCode]?.[toCode]?.dateTime ?? '';
+    const requestKey = `${fromCode}|${toCode}|${amount}`;
+    const isFirstPriceRequest = useRef<boolean>(true);
 
-  return {
-    currencies,
-    fromCode,
-    toCode,
-    amount,
-    conversionResult,
-    rate,
-    fromCurrency,
-    toCurrency,
-    setFrom,
-    setTo,
-    setAmount,
-    swap,
-    dateTime
-  };
+    // todo: cancelled -> AbortController
+    // todo: первая загрузка данных без debounced
+    // get /price - init
+    useEffect(() => {
+        const [from, to] = requestKey.split('|');
+        if (!from || !to) {
+            return;
+        }
+
+        const abortController = new AbortController();
+        const run = () => {
+            dispatch({type: 'PRICE_FETCH_START'});
+            fetchPriceChange(
+                {purchasedCurrency: from, paymentCurrency: to},
+                abortController.signal
+            )
+                .then((changes) => {
+                    const latest = changes.length > 0 ? changes[changes.length - 1] : null;
+                    dispatch({type: 'PRICE_LOADED', payload: latest});
+                })
+                .catch((e) => {
+                    if (isAbortError(e)) {
+                        return;
+                    }
+
+                    dispatch({type: 'PRICE_ERROR', payload: toMessage(e)});
+                });
+        };
+
+        if (isFirstPriceRequest.current) {
+            isFirstPriceRequest.current = false;
+            run();
+
+            return () => abortController.abort();
+        }
+
+        const timer = setInterval(run, CONFIG.settings.debounceDelayMs);
+        return () => {
+            clearTimeout(timer);
+            abortController.abort();
+        }
+    }, [requestKey]);
+
+    const fromCurrency = currencies.find(currency => currency.code === fromCode);
+    const toCurrency = currencies.find(currency => currency.code === toCode);
+    const rate = priceChange?.price ?? 0;
+    const conversionResult = amount * rate;
+    const dateTime = priceChange?.dateTime ?? '';
+
+    return {
+        currencies,
+        fromCode,
+        toCode,
+        amount,
+        rate,
+        conversionResult,
+        fromCurrency,
+        toCurrency,
+        dateTime,
+
+        // states
+        isLoading,
+        initialized,
+        initError,
+        runtimeError,
+        hasData: currencies.length > 0,
+
+        // actions
+        setFrom: (code: string) => dispatch({type: 'SET_FROM', payload: code}),
+        setTo: (code: string) => dispatch({type: 'SET_TO', payload: code}),
+        setAmount: (value: number) => dispatch({type: 'SET_AMOUNT', payload: value}),
+        swap: () => dispatch({type: 'SWAP'}),
+        dismissRuntimeError: () => dispatch({type: 'RUNTIME_ERROR_DISMISS'})
+    };
 };
